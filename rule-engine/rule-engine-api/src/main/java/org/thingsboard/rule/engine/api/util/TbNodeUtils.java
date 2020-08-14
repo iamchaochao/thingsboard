@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2019 The Thingsboard Authors
+ * Copyright © 2016-2020 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,15 @@ package org.thingsboard.rule.engine.api.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.CollectionUtils;
 import org.thingsboard.rule.engine.api.TbNodeConfiguration;
 import org.thingsboard.rule.engine.api.TbNodeException;
 import org.thingsboard.server.common.msg.TbMsgMetaData;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by ashvayka on 19.01.18.
@@ -39,6 +43,13 @@ public class TbNodeUtils {
         } catch (JsonProcessingException e) {
             throw new TbNodeException(e);
         }
+    }
+
+    public static List<String> processPatterns(List<String> patterns, TbMsgMetaData metaData) {
+        if (!CollectionUtils.isEmpty(patterns)) {
+            return patterns.stream().map(p -> processPattern(p, metaData)).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     public static String processPattern(String pattern, TbMsgMetaData metaData) {

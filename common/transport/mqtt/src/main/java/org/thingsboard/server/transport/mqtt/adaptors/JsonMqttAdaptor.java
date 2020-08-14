@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2019 The Thingsboard Authors
+ * Copyright © 2016-2020 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,23 +207,20 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
         try {
             return new JsonParser().parse(payload);
         } catch (JsonSyntaxException ex) {
+            log.warn("Payload is in incorrect format: {}", payload);
             throw new AdaptorException(ex);
         }
     }
 
     private static String validatePayload(UUID sessionId, ByteBuf payloadData, boolean isEmptyPayloadAllowed) throws AdaptorException {
-        try {
-            String payload = payloadData.toString(UTF8);
-            if (payload == null) {
-                log.warn("[{}] Payload is empty!", sessionId);
-                if (!isEmptyPayloadAllowed) {
-                    throw new AdaptorException(new IllegalArgumentException("Payload is empty!"));
-                }
+        String payload = payloadData.toString(UTF8);
+        if (payload == null) {
+            log.warn("[{}] Payload is empty!", sessionId);
+            if (!isEmptyPayloadAllowed) {
+                throw new AdaptorException(new IllegalArgumentException("Payload is empty!"));
             }
-            return payload;
-        } finally {
-            payloadData.release();
         }
+        return payload;
     }
 
 }
